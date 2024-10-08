@@ -1,7 +1,5 @@
 # Schwarzschild Metric Visualization
 
-![Schwarzschild Metric](path/to/screenshot.png) <!-- Add a screenshot of your visualization here -->
-
 ## Overview
 
 The **Schwarzschild Metric Visualization** is an interactive web application that visualizes the curvature of space around a spherically symmetric, non-rotating massive object (e.g., a black hole) as described by the Schwarzschild metric in General Relativity. Utilizing HTML, CSS, and JavaScript along with the Plotly.js library, this project offers dynamic 2D and 3D representations to help users understand complex spacetime geometries.
@@ -47,9 +45,3 @@ R(r) = \sqrt{r(r - r_s)} + r_s \ln \left( \frac{\sqrt{r} + \sqrt{r - r_s}}{\sqrt
 
 where \( r_0 \) is a reference point, typically just above the Schwarzschild radius \( r_s \).
 
-## Installation
-
-1. **Clone the Repository**
-
-   ```bash
-   git clone https://github.com/your-username/Schwarzschild-Metric-Visualization.git

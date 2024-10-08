@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <title>Vizualizácia Schwarzschildovej Metriky</title>
+    <!-- Štýly pre moderný vzhľad -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e2a38;
+            color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007acc;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        #languageToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            color: #007acc;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        #description {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #2e3b4e;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #description h2 {
+            color: #00bfff;
+        }
+        #controls {
+            background-color: #2e3b4e;
+            padding: 20px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        #controls label, #controls input, #controls button {
+            margin: 10px;
+            font-size: 16px;
+        }
+        #controls input {
+            width: 80px;
+            padding: 5px;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+        }
+        #controls button {
+            background-color: #00bfff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #controls button:hover {
+            background-color: #009acd;
+        }
+        #visualizations {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+        #plot2d, #plot3d, #plot2d_time {
+            margin: 40px 0;
+        }
+        h2 {
+            text-align: center;
+            color: #00bfff;
+        }
+        footer {
+            background-color: #2e3b4e;
+            padding: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #f0f4f8;
+        }
+        /* Responsívne grafy */
+        .plot-container {
+            width: 1200px;
+            height: 1200px; /* Optimalizovaná výška grafov */
+        }
+    </style>
+    <!-- Zahrnutie Plotly.js pre interaktívne grafy -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Zahrnutie MathJax pre pekné zobrazenie rovníc -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<header>
+    <h1 id="title-sk">Vizualizácia Schwarzschildovej Metriky</h1>
+    <h1 id="title-en" style="display: none;">Visualization of the Schwarzschild Metric</h1>
+    <button id="languageToggle">EN</button>
+</header>
+
+<div id="description">
+    <div id="desc-sk">
+        <!-- Slovenský popis -->
+        <h2>O Schwarzschildovej Metrike</h2>
+        <p>
+            Schwarzschildova metrika popisuje zakrivenie priestoru okolo sféricky symetrického neotáčajúceho sa hmotného objektu (napr. čiernej diery) vo všeobecnej teórii relativity.
+        </p>
+        <p>
+            <strong>Schwarzschildova metrika v sférických súradniciach \((t, r, \theta, \phi)\)</strong> je daná rovnicou:
+        </p>
+        \[
+        ds^2 = -\left(1 - \frac{r_s}{r}\right) c^2 dt^2 + \left(1 - \frac{r_s}{r}\right)^{-1} dr^2 + r^2 (d\theta^2 + \sin^2 \theta \, d\phi^2)
+        \]
+        <p>
+            kde \( r_s \) je Schwarzschildov polomer:
+        </p>
+        \[
+        r_s = \frac{2GM}{c^2}
+        \]
+        <p>
+            <strong>Efektívna radiálna vzdialenosť \( R(r) \)</strong> je daná integrálom:
+        </p>
+        \[
+        R(r) = \int_{r_0}^{r} \frac{dr'}{\sqrt{1 - \frac{r_s}{r'}}}
+        \]
+        <p>
+            Tento integrál môže byť vyjadrený analyticky ako:
+        </p>
+        \[
+        R(r) = \sqrt{r(r - r_s)} + r_s \ln \left( \frac{\sqrt{r} + \sqrt{r - r_s}}{\sqrt{r_s}} \right) - \left( \sqrt{r_0(r_0 - r_s)} + r_s \ln \left( \frac{\sqrt{r_0} + \sqrt{r_0 - r_s}}{\sqrt{r_s}} \right) \right)
+        \]
+        <p>
+            kde \( r_0 \) je referenčný bod (zvyčajne tesne nad Schwarzschildovým polomerom \( r_s \)).
+        </p>
+        <p>
+            <strong>Metóda vizualizácie:</strong> Táto vizualizácia zobrazuje zakrivený priestor okolo čiernej diery podľa Schwarzschildovej metriky. Efektívna radiálna vzdialenosť \( R(r) \) reprezentuje vlastnú vzdialenosť meranú v zakrivenom priestore, pričom zobrazuje, ako sa priestor "rozťahuje" smerom k horizontu udalostí.
+        </p>
+    </div>
+    <div id="desc-en" style="display: none;">
+        <!-- Anglický popis -->
+        <h2>About the Schwarzschild Metric</h2>
+        <p>
+            The Schwarzschild metric describes the curvature of space around a spherically symmetric non-rotating massive object (e.g., a black hole) in general relativity.
+        </p>
+        <p>
+            <strong>The Schwarzschild metric in spherical coordinates \((t, r, \theta, \phi)\)</strong> is given by the equation:
+        </p>
+        \[
+        ds^2 = -\left(1 - \frac{r_s}{r}\right) c^2 dt^2 + \left(1 - \frac{r_s}{r}\right)^{-1} dr^2 + r^2 (d\theta^2 + \sin^2 \theta \, d\phi^2)
+        \]
+        <p>
+            where \( r_s \) is the Schwarzschild radius:
+        </p>
+        \[
+        r_s = \frac{2GM}{c^2}
+        \]
+        <p>
+            <strong>The effective radial distance \( R(r) \)</strong> is given by the integral:
+        </p>
+        \[
+        R(r) = \int_{r_0}^{r} \frac{dr'}{\sqrt{1 - \frac{r_s}{r'}}}
+        \]
+        <p>
+            This integral can be expressed analytically as:
+        </p>
+        \[
+        R(r) = \sqrt{r(r - r_s)} + r_s \ln \left( \frac{\sqrt{r} + \sqrt{r - r_s}}{\sqrt{r_s}} \right) - \left( \sqrt{r_0(r_0 - r_s)} + r_s \ln \left( \frac{\sqrt{r_0} + \sqrt{r_0 - r_s}}{\sqrt{r_s}} \right) \right)
+        \]
+        <p>
+            where \( r_0 \) is a reference point (usually just above the Schwarzschild radius \( r_s \)).
+        </p>
+        <p>
+            <strong>Visualization Method:</strong> This visualization depicts the curvature of space around a black hole according to the Schwarzschild metric. The effective radial distance \( R(r) \) represents the proper distance measured in curved space, illustrating how space is "stretches" towards the event horizon.
+        </p>
+    </div>
+</div>
+
+<div id="controls">
+    <label id="label-numRadialPoints" for="numRadialPoints">Počet radiálnych bodov (r):</label>
+    <input type="number" id="numRadialPoints" value="100" min="10" max="500">
+    <label id="label-numAngularPoints" for="numAngularPoints">Počet uhlových bodov (φ pre 2D, θ a φ pre 3D):</label>
+    <input type="number" id="numAngularPoints" value="100" min="10" max="500">
+    <button id="updateButton">Aktualizovať Vizualizácie</button>
+</div>
+
+<div id="visualizations">
+    <div id="plot2d">
+        <h2 id="plot2d-title-sk">2D Vizualizácia</h2>
+        <h2 id="plot2d-title-en" style="display: none;">2D Visualization</h2>
+        <div id="graph2d" class="plot-container"></div>
+    </div>
+    <div id="plot3d">
+        <h2 id="plot3d-title-sk">3D Vizualizácia</h2>
+        <h2 id="plot3d-title-en" style="display: none;">3D Visualization</h2>
+        <div id="graph3d" class="plot-container"></div>
+    </div>
+    <div id="plot2d_time">
+        <h2 id="plot2d_time-title-sk">2D Simulácia Plynutia Času</h2>
+        <h2 id="plot2d_time-title-en" style="display: none;">2D Time Flow Simulation</h2>
+        <div id="graph2d_time" class="plot-container"></div>
+    </div>
+</div>
+
+<footer>
+    <div id="footer-text">Autor: Ing. Robert Polak</div>
+</footer>
+
+<script>
+    // JavaScript pre prepínanie jazyka a vykresľovanie grafov
+    // Premenná pre aktuálny jazyk
+    let currentLanguage = 'sk';
+
+    // Funkcia pre prepínanie jazyka
+    const languageToggle = document.getElementById('languageToggle');
+    languageToggle.addEventListener('click', () => {
+        if (currentLanguage === 'sk') {
+            // Prepnutie na angličtinu
+            document.getElementById('title-sk').style.display = 'none';
+            document.getElementById('title-en').style.display = 'block';
+            document.getElementById('desc-sk').style.display = 'none';
+            document.getElementById('desc-en').style.display = 'block';
+            document.getElementById('plot2d-title-sk').style.display = 'none';
+            document.getElementById('plot2d-title-en').style.display = 'block';
+            document.getElementById('plot3d-title-sk').style.display = 'none';
+            document.getElementById('plot3d-title-en').style.display = 'block';
+            document.getElementById('plot2d_time-title-sk').style.display = 'none';
+            document.getElementById('plot2d_time-title-en').style.display = 'block';
+            languageToggle.textContent = 'SK';
+            currentLanguage = 'en';
+
+            // Aktualizácia labelov a tlačidla
+            document.getElementById('label-numRadialPoints').textContent = 'Number of radial points (r):';
+            document.getElementById('label-numAngularPoints').textContent = 'Number of angular points (φ for 2D, θ and φ for 3D):';
+            document.getElementById('updateButton').textContent = 'Update Visualizations';
+
+            // Aktualizácia pätičky
+            document.getElementById('footer-text').textContent = 'Author: Ing. Robert Polak';
+        } else {
+            // Prepnutie na slovenčinu
+            document.getElementById('title-sk').style.display = 'block';
+            document.getElementById('title-en').style.display = 'none';
+            document.getElementById('desc-sk').style.display = 'block';
+            document.getElementById('desc-en').style.display = 'none';
+            document.getElementById('plot2d-title-sk').style.display = 'block';
+            document.getElementById('plot2d-title-en').style.display = 'none';
+            document.getElementById('plot3d-title-sk').style.display = 'block';
+            document.getElementById('plot3d-title-en').style.display = 'none';
+            document.getElementById('plot2d_time-title-sk').style.display = 'block';
+            document.getElementById('plot2d_time-title-en').style.display = 'none';
+            languageToggle.textContent = 'EN';
+            currentLanguage = 'sk';
+
+            // Aktualizácia labelov a tlačidla
+            document.getElementById('label-numRadialPoints').textContent = 'Počet radiálnych bodov (r):';
+            document.getElementById('label-numAngularPoints').textContent = 'Počet uhlových bodov (φ pre 2D, θ a φ pre 3D):';
+            document.getElementById('updateButton').textContent = 'Aktualizovať Vizualizácie';
+
+            // Aktualizácia pätičky
+            document.getElementById('footer-text').textContent = 'Autor: Ing. Robert Polak';
+        }
+    });
+
+    // Fyzikálne konštanty (G = c = 1)
+    const G_const = 1;
+    const c_const = 1;
+    const M_const = 1;
+    const rs = 2 * G_const * M_const / (c_const ** 2);
+
+    // Funkcia pre výpočet efektívnej radiálnej vzdialenosti R(r)
+    function computeR(r, r0) {
+        if (r <= rs) {
+            return NaN;
+        }
+        const sqrtTerm = Math.sqrt(r * (r - rs));
+        const logTerm = rs * Math.log((Math.sqrt(r) + Math.sqrt(r - rs)) / Math.sqrt(rs));
+        const sqrtTerm0 = Math.sqrt(r0 * (r0 - rs));
+        const logTerm0 = rs * Math.log((Math.sqrt(r0) + Math.sqrt(r0 - rs)) / Math.sqrt(rs));
+        return (sqrtTerm + logTerm) - (sqrtTerm0 + logTerm0);
+    }
+
+    // Funkcia pre generovanie dát pre 2D vizualizáciu
+    function generate2DData(numRadialPoints, numAngularPoints) {
+        const r0 = rs + 0.001;
+        const x_vals = [];
+        const y_vals = [];
+
+        // Generovanie dát
+        for (let i = 0; i < numRadialPoints; i++) {
+            const r = r0 + (10 - r0) * i / (numRadialPoints - 1);
+            const R = computeR(r, r0);
+            if (isNaN(R)) continue;
+
+            for (let j = 0; j < numAngularPoints; j++) {
+                const phi = 2 * Math.PI * j / (numAngularPoints - 1);
+                const x = R * Math.cos(phi);
+                const y = R * Math.sin(phi);
+                x_vals.push(x);
+                y_vals.push(y);
+            }
+        }
+
+        return { x_vals, y_vals };
+    }
+
+    // Funkcia pre generovanie dát pre 3D vizualizáciu
+    function generate3DData(numRadialPoints, numAngularPoints) {
+        const r0 = rs + 0.001;
+        const x_vals = [];
+        const y_vals = [];
+        const z_vals = [];
+
+        // Generovanie dát
+        for (let i = 0; i < numRadialPoints; i++) {
+            const r = r0 + (10 - r0) * i / (numRadialPoints - 1);
+            const R = computeR(r, r0);
+            if (isNaN(R)) continue;
+
+            for (let j = 0; j < numAngularPoints; j++) {
+                const theta = Math.PI * j / (numAngularPoints - 1);
+                for (let k = 0; k < numAngularPoints; k++) {
+                    const phi = 2 * Math.PI * k / (numAngularPoints - 1);
+                    const x = R * Math.sin(theta) * Math.cos(phi);
+                    const y = R * Math.sin(theta) * Math.sin(phi);
+                    const z = R * Math.cos(theta);
+                    x_vals.push(x);
+                    y_vals.push(y);
+                    z_vals.push(z);
+                }
+            }
+        }
+
+        return { x_vals, y_vals, z_vals };
+    }
+
+    // Funkcia pre vykreslenie 2D grafu
+    function plot2D(numRadialPoints, numAngularPoints) {
+        const { x_vals, y_vals } = generate2DData(numRadialPoints, numAngularPoints);
+
+        const trace = {
+            x: x_vals,
+            y: y_vals,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 2, color: '#00bfff' },
+        };
+
+        const layout = {
+            title: currentLanguage === 'sk' ? '2D Vizualizácia Zakriveného Priestoru' : '2D Visualization of Curved Space',
+            xaxis: { title: 'X' },
+            yaxis: { title: 'Y' },
+            showlegend: false,
+            autosize: true,
+            width: 1200,   // Nastavenie šírky grafu na 95% šírky okna
+            height: 1200,  // Nastavenie výšky grafu na 100% výšky okna
+            paper_bgcolor: '#1e2a38',
+            plot_bgcolor: '#1e2a38',
+            font: { color: '#f0f4f8' },
+        };
+
+        Plotly.newPlot('graph2d', [trace], layout, {responsive: true});
+    }
+
+    // Funkcia pre vykreslenie 3D grafu
+    function plot3D(numRadialPoints, numAngularPoints) {
+        const { x_vals, y_vals, z_vals } = generate3DData(numRadialPoints, numAngularPoints);
+
+        const trace = {
+            x: x_vals,
+            y: y_vals,
+            z: z_vals,
+            mode: 'markers',
+            type: 'scatter3d',
+            marker: { size: 1, color: '#00bfff' },
+        };
+
+        const layout = {
+            title: currentLanguage === 'sk' ? '3D Vizualizácia Zakriveného Priestoru' : '3D Visualization of Curved Space',
+            scene: {
+                xaxis: { title: 'X', backgroundcolor: '#1e2a38', color: '#f0f4f8' },
+                yaxis: { title: 'Y', backgroundcolor: '#1e2a38', color: '#f0f4f8' },
+                zaxis: { title: 'Z', backgroundcolor: '#1e2a38', color: '#f0f4f8' },
+                aspectmode: 'cube',
+                bgcolor: '#1e2a38',
+            },
+            showlegend: false,
+            autosize: true,
+            width: 1200,   // Nastavenie šírky grafu na 95% šírky okna
+            height: 1200,  // Nastavenie výšky grafu na 100% výšky okna
+            paper_bgcolor: '#1e2a38',
+            font: { color: '#f0f4f8' },
+        };
+
+        Plotly.newPlot('graph3d', [trace], layout, {responsive: true});
+    }
+
+    // Funkcia pre pridanie horizontu udalostí do 3D grafu
+    function addEventHorizon3D() {
+        const r0 = rs + 0.001;
+        const delta = 0.1; // Malá vzdialenosť od horizontu udalostí pre vizualizáciu
+        const r_event = rs + delta;
+        const R_event = computeR(r_event, r0);
+
+        // Vytvorenie kruhu horizontu udalostí
+        const x_h = [];
+        const y_h = [];
+        const z_h = [];
+        const numPoints = 200;
+        for (let i = 0; i < numPoints; i++) {
+            const u = 2 * Math.PI * i / (numPoints - 1);
+            x_h.push(R_event * Math.cos(u));
+            y_h.push(R_event * Math.sin(u));
+            z_h.push(0); // Horizont udalostí je v rovine Z=0
+        }
+
+        const trace_horizon = {
+            x: x_h,
+            y: y_h,
+            z: z_h,
+            mode: 'lines',
+            type: 'scatter3d',
+            line: {
+                color: '#ff4500',
+                width: 4,
+            },
+            name: currentLanguage === 'sk' ? 'Horizont udalostí' : 'Event Horizon',
+        };
+
+        Plotly.addTraces('graph3d', [trace_horizon]);
+    }
+
+    // Funkcia pre vykreslenie 2D časového grafu
+    function plot2DTime(numRadialPoints, numAngularPoints) {
+        const { x_vals, y_vals } = generate2DData(numRadialPoints, numAngularPoints);
+
+        // Výpočet efektívnej radiálnej vzdialenosti pre každý bod
+        const r0 = rs + 0.001;
+        const R_vals = [];
+        for (let i = 0; i < numRadialPoints; i++) {
+            const r = r0 + (10 - r0) * i / (numRadialPoints - 1);
+            const R = computeR(r, r0);
+            if (!isNaN(R)) {
+                for (let j = 0; j < numAngularPoints; j++) {
+                    R_vals.push(R);
+                }
+            }
+        }
+
+        // Výpočet rotácie pre každý bod založený na časovej dilatácii
+        const baseSpeed = 0.05; // Zväčšená základná rýchlosť rotácie
+        const rotationSpeeds = R_vals.map(R => {
+            return (R > rs) ? Math.sqrt(1 - rs / R) * baseSpeed : 0; // Normovaná rýchlosť s časovou dilatáciou
+        });
+
+        // Inicializácia fáz pre všetky guličky na rovnakú hodnotu
+        const initialPhase = 0;
+        const phases = rotationSpeeds.map(() => initialPhase);
+
+        // Inicializácia farieb
+        const initialColors = rotationSpeeds.map(() => 'rgba(0, 0, 255, 0.8)'); // Modrá farba
+
+        const trace = {
+            x: x_vals,
+            y: y_vals,
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 5, color: initialColors },
+        };
+
+        const layout = {
+            title: currentLanguage === 'sk' ? '2D Simulácia Plynutia Času' : '2D Time Flow Simulation',
+            xaxis: { title: 'X' },
+            yaxis: { title: 'Y' },
+            showlegend: false,
+            autosize: true,
+            width: 1200,
+            height: 1200,
+            paper_bgcolor: '#1e2a38',
+            plot_bgcolor: '#1e2a38',
+            font: { color: '#f0f4f8' },
+        };
+
+        Plotly.newPlot('graph2d_time', [trace], layout, {responsive: true});
+
+        // Animácia farieb guličiek
+        function animateTimeFlow() {
+            for (let i = 0; i < phases.length; i++) {
+                if (rotationSpeeds[i] === 0) continue; // Zastavenie rotácie na horizonte
+
+                // Aktualizácia fázy
+                phases[i] += rotationSpeeds[i];
+                if (phases[i] > 2 * Math.PI) {
+                    phases[i] -= 2 * Math.PI;
+                }
+
+                // Výpočet farby na základe fázy
+                const angle = phases[i];
+                const r = Math.cos(angle);
+                const g = 0;
+                const b = Math.sin(angle);
+                // Normalizácia hodnôt na interval [0,255]
+                const red = Math.abs(r) * 255;
+                const blue = Math.abs(b) * 255;
+                initialColors[i] = `rgba(${red.toFixed(0)}, ${g}, ${blue.toFixed(0)}, 0.8)`;
+            }
+
+            Plotly.update('graph2d_time', { marker: { color: initialColors } }, {}, [0]);
+
+            requestAnimationFrame(animateTimeFlow);
+        }
+
+        animateTimeFlow();
+    }
+
+    // Inicializácia a aktualizácia vizualizácií
+    document.getElementById('updateButton').addEventListener('click', () => {
+        const numRadialPoints = parseInt(document.getElementById('numRadialPoints').value);
+        const numAngularPoints = parseInt(document.getElementById('numAngularPoints').value);
+        plot2D(numRadialPoints, numAngularPoints);
+        plot3D(numRadialPoints, numAngularPoints);
+        plot2DTime(30, 30); // Menší počet bodov pre časovú simuláciu
+        addEventHorizon3D();
+    });
+
+    // Funkcia na nastavenie veľkosti grafov pri zmene veľkosti okna
+    window.addEventListener('resize', () => {
+        const numRadialPoints = parseInt(document.getElementById('numRadialPoints').value);
+        const numAngularPoints = parseInt(document.getElementById('numAngularPoints').value);
+        plot2D(numRadialPoints, numAngularPoints);
+        plot3D(numRadialPoints, numAngularPoints);
+        plot2DTime(30, 30); // Menší počet bodov pre časovú simuláciu
+        addEventHorizon3D();
+    });
+
+    // Prvé vykreslenie
+    plot2D(100, 100);
+    plot3D(20, 20);
+    plot2DTime(30, 30); // Menší počet bodov pre časovú simuláciu
+    addEventHorizon3D();
+</script>
+
+</body>
+</html>
